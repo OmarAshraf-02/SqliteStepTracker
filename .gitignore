@@ -1,0 +1,124 @@
+# Ignore the build output directories
+bin/
+obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated files
+*.generated.cs
+Generated/
+
+# Build results
+*.dll
+*.exe
+*.pdb
+*.cache
+*.ilk
+*.log
+*.meta
+*.obj
+*.tlog
+*.tmp
+*.vspscc
+*.vssscc
+*.db
+
+# Visual Studio Code specific files
+.vscode/
+.history/
+
+# Rider-specific files
+.idea/
+
+# Resharper specific files
+*.DotSettings.user
+_ReSharper.Caches/
+
+# DotCover
+.dotCover
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_
+
+# Backup & report files
+*.bak
+*.swp
+*._*
+*.log
+*.sln.docstates
+
+# IIS & ASP.NET
+.IISExpress/
+.vs/
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# Project-specific files
+*.dbmdl
+*.dbproj
+*.jfm
+*.modelproj
+
+# LightSwitch generated files
+GeneratedArtifacts/
+_Pvt_Extensions/
+ModelManifest.xml
+
+# SQL Server files
+*.mdf
+*.ldf
+
+# Microsoft Azure Web App publish settings
+*.publishsettings
+
+# Others
+.dump
+.exported.pfx
+*.aps
+package.ps1
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Don't ignore nuget packages in the repository, just ignore their object files
+# NuGet Packages
+*.nupkg
+**/packages/*/
+# Except build/, which is used as an MSBuild target.
+!**/packages/build/
+# Include all other files
+!**/packages/repositories.config
+
