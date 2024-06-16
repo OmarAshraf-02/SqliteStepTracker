@@ -11,4 +11,11 @@ internal static class Input
 
         return !invalidInput;
     }
+
+    internal static bool ValidateInsertionInput(ref string? steps)
+    {
+        if (!int.TryParse(steps, out int parsedSteps) || parsedSteps < 0) return false;
+
+        return true;
+    }
 }

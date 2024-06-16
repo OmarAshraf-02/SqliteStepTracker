@@ -2,59 +2,64 @@
 using Microsoft.Data.Sqlite;
 
 Console.Clear();
+
 bool exit = false;
+string path = $"Data Source={Environment.CurrentDirectory}/Steps.db";
 
-var dropTable = @"DROP TABLE steps";
+using SqliteConnection connection = new(path);
+connection.Open();
 
-var createTable = @"CREATE TABLE steps(
-    id INTEGER PRIMARY KEY,
-    steps INTEGER NOT NULL,
-    date DATE NOT NULL
-)";
-
-try
-{
-    using SqliteConnection connection = new($"Data Source={Environment.CurrentDirectory}/StepTracker.db");
-    connection.Open();
-
-    using SqliteCommand dropTableCommand = new(dropTable, connection);
-    dropTableCommand.ExecuteNonQuery();
-
-    using SqliteCommand createTableCommand = new(createTable, connection);
-    createTableCommand.ExecuteNonQuery();
-
-    Console.WriteLine("Table 'steps' created successfully.");
-}
-catch (SqliteException ex)
-{
-    Console.WriteLine(ex.Message);
-}
+SqliteCommand createTable = new(Queries.createTable, connection);
+createTable.ExecuteNonQuery();
 
 while (true)
 {
-    Menu.PrintTitle();
+    Menu.PrintCyan("Sqlite Step Tracker");
     Menu.PrintMainMenu();
 
     string? input = Console.ReadLine();
 
-    while (!Input.ValidateMainMenuInput(input))
-    {
-        Console.Clear();
-        Menu.PrintInvalidInput();
-        Menu.PrintMainMenu();
-        input = Console.ReadLine();
-    }
+    input = Menu.MainMenuInputLoop(input);
 
-    int parsedInput = int.Parse(input);
+    bool _ = int.TryParse(input, out int parsedInput);
 
     switch (parsedInput)
     {
         case 0:
             exit = true;
             break;
-    }
+        case 1:
+            Console.Write("Steps: ");
+            string? stepsInput = Console.ReadLine();
 
-    Console.Clear();
+            Menu.InsertMenuInputLoop(ref stepsInput);
+
+            DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+            string date = currentDate.ToString("yyyy-MM-dd");
+
+            bool parse = int.TryParse(stepsInput, out int steps);
+            string sql = $"INSERT INTO steps(steps,date) VALUES({steps},'{date}')";
+
+            SqliteCommand insert = new(sql, connection);
+            insert.ExecuteNonQuery();
+
+            Menu.PrintCyan($"Logged steps for {currentDate:dd-MM-yyyy}!");
+            break;
+        case 2:
+            Menu.PrintCyan("ID\tSteps\tDate");
+
+            SqliteCommand getTable = new(Queries.getTable, connection);
+            SqliteDataReader reader = getTable.ExecuteReader();
+            Menu.PrintTableRows(reader);
+            break;
+        case 3:
+            Console.WriteLine("Choose which ID to update");
+
+            break;
+        case 4:
+
+            break;
+    }
 
     if (exit) break;
 }
