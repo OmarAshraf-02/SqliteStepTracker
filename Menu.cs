@@ -14,23 +14,15 @@ internal static class Menu
         Console.Write("Input: ");
     }
 
-    internal static void PrintInvalidInput()
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Please input a valid option (0-4)");
-        Console.ForegroundColor = ConsoleColor.White;
-    }
-
     internal static string? MainMenuInputLoop(string? input)
     {
         while (!Input.IsValidMainMenuInput(input))
         {
             Console.Clear();
-            PrintInvalidInput();
+            PrintError("Please input a valid option (0-4)");
             PrintMainMenu();
             input = Console.ReadLine();
         }
-
         return input;
     }
 
@@ -60,6 +52,7 @@ internal static class Menu
         table.AddColumn("[bold cyan3]ID[/]");
         table.AddColumn("[bold cyan3]Steps[/]");
         table.AddColumn("[bold cyan3]Date[/]");
+
         while (reader.Read())
         {
             table.AddRow($"{reader.GetInt32(0)}", $"{reader.GetInt32(1)}", $"{reader.GetDateTime(2):dd-MM-yyyy}");
@@ -100,5 +93,4 @@ internal static class Menu
         Console.ReadLine();
         Console.Clear();
     }
-
 }

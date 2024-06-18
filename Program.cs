@@ -2,7 +2,10 @@
 using Microsoft.Data.Sqlite;
 
 Console.Clear();
-bool exit = false;
+bool endProgram = false;
+
+DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+string date = currentDate.ToString("yyyy-MM-dd");
 string path = $"Data Source={Environment.CurrentDirectory}/Steps.db";
 using SqliteConnection connection = Db.InitializeDb(path);
 
@@ -18,35 +21,23 @@ while (true)
     switch (parsedInput)
     {
         case 0:
-            exit = true;
+            endProgram = true;
             break;
         case 1:
             Console.Write("Steps: ");
             string? stepsInput = Console.ReadLine();
             Menu.StepInputLoop(ref stepsInput);
 
-            DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
-            string date = currentDate.ToString("yyyy-MM-dd");
-
             _ = int.TryParse(stepsInput, out int steps);
-            string idExistsQuery = $"SELECT * FROM steps WHERE date='{date}'";
 
-            SqliteCommand idExists = new(idExistsQuery, connection);
-            SqliteDataReader idExistsReader = idExists.ExecuteReader();
-
-            if (idExistsReader.HasRows)
+            if (Db.FindCurrentDate(connection))
             {
                 Menu.PrintError("You already logged your steps for today, select 'Update Steps' to change this entry");
                 Menu.EnterToContinue();
                 continue;
             }
 
-            string insertQuery = $"INSERT INTO steps(steps,date) VALUES({steps},'{date}')";
-            using (SqliteCommand insert = new(insertQuery, connection))
-            {
-                insert.ExecuteNonQuery();
-            }
-
+            Db.InsertSteps(steps, date, connection);
             Menu.PrintCyan($"Logged steps for {currentDate:dd-MM-yyyy}!");
             Menu.EnterToContinue();
             break;
@@ -97,6 +88,6 @@ while (true)
             }
             break;
     }
-    if (exit) break;
+    if (endProgram) break;
 }
 Console.Clear();

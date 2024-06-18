@@ -19,6 +19,13 @@ internal class Db
         updateSteps.ExecuteNonQuery();
     }
 
+    internal static void InsertSteps(int steps, string date, SqliteConnection connection)
+    {
+        string insertQuery = $"INSERT INTO steps(steps,date) VALUES({steps},'{date}')";
+        using SqliteCommand insert = new(insertQuery, connection);
+        insert.ExecuteNonQuery();
+    }
+
     internal static void DeleteSteps(int parsedId, SqliteConnection connection)
     {
         string deleteQuery = $"DELETE from steps WHERE id={parsedId}";
@@ -34,5 +41,16 @@ internal class Db
         createTable.ExecuteNonQuery();
 
         return connection;
+    }
+
+    internal static bool FindCurrentDate(SqliteConnection connection)
+    {
+        DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+        string date = currentDate.ToString("yyyy-MM-dd");
+
+        string idExistsQuery = $"SELECT * FROM steps WHERE date='{date}'";
+        SqliteCommand idExists = new(idExistsQuery, connection);
+        SqliteDataReader idExistsReader = idExists.ExecuteReader();
+        return idExistsReader.HasRows;
     }
 }
