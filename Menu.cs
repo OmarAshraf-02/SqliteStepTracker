@@ -58,9 +58,7 @@ internal static class Menu
         }
         else
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("You haven't logged any steps yet");
-            Console.ForegroundColor = ConsoleColor.White;
+            PrintError("You haven't logged any steps yet");
         }
     }
 
@@ -73,7 +71,7 @@ internal static class Menu
 
     internal static void PrintError(string s)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(s);
         Console.ForegroundColor = ConsoleColor.White;
     }
