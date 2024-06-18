@@ -62,7 +62,7 @@ while (true)
                     Menu.PrintTableRows(reader);
                 }
 
-                Console.WriteLine("Choose which ID to update");
+                Console.WriteLine("Choose which entry to update");
                 Console.Write("ID: ");
                 string? idInput = Console.ReadLine();
 
@@ -103,7 +103,43 @@ while (true)
             }
             break;
         case 4:
+            while (true)
+            {
+                using (SqliteCommand getTable = new(Queries.getTable, connection))
+                {
+                    using SqliteDataReader reader = getTable.ExecuteReader();
+                    Menu.PrintTableRows(reader);
+                }
 
+                Console.WriteLine("Choose which entry to delete");
+                Console.Write("ID: ");
+                string? idToDeleteInput = Console.ReadLine();
+
+                bool isValidNumber = int.TryParse(idToDeleteInput, out int parsedIdToDelete) && parsedIdToDelete > 0;
+                if (!isValidNumber)
+                {
+                    Menu.PrintError("Input a valid integer ID > 0");
+                    continue;
+                }
+
+                string findIdQuery = $"SELECT * FROM steps WHERE id={parsedIdToDelete}";
+                SqliteCommand findId = new(findIdQuery, connection);
+                SqliteDataReader findIdReader = findId.ExecuteReader();
+
+                if (!findIdReader.HasRows)
+                {
+                    Menu.PrintError("ID wasn't found");
+                    continue;
+                }
+
+                string deleteQuery = $"DELETE from steps WHERE id={parsedIdToDelete}";
+                SqliteCommand deleteSteps = new(deleteQuery, connection);
+                deleteSteps.ExecuteNonQuery();
+
+                Menu.PrintCyan($"Deleted step entry no.{parsedIdToDelete}");
+                Menu.EnterToContinue();
+                break;
+            }
             break;
     }
     if (exit) break;
