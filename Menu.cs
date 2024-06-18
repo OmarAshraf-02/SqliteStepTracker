@@ -50,6 +50,7 @@ internal static class Menu
     {
         if (reader.HasRows)
         {
+            PrintCyan("ID\tSteps\tDate");
             while (reader.Read())
             {
                 Console.WriteLine($"{reader.GetInt32(0)}\t{reader.GetInt32(1)}\t{reader.GetDateTime(2):dd-MM-yyyy}");
@@ -68,6 +69,20 @@ internal static class Menu
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine(s);
         Console.ForegroundColor = ConsoleColor.White;
+    }
+
+    internal static void PrintError(string s)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine(s);
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+
+    internal static void EnterToContinue()
+    {
+        PrintCyan("Press ENTER to continue");
+        Console.ReadLine();
+        Console.Clear();
     }
 
 }
