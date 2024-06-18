@@ -19,7 +19,7 @@ while (true)
 
     string? input = Console.ReadLine();
     input = Menu.MainMenuInputLoop(input);
-    bool _ = int.TryParse(input, out int parsedInput);
+    _ = int.TryParse(input, out int parsedInput);
 
     switch (parsedInput)
     {
@@ -34,9 +34,21 @@ while (true)
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
             string date = currentDate.ToString("yyyy-MM-dd");
 
-            bool parse = int.TryParse(stepsInput, out int steps);
-            string sql = $"INSERT INTO steps(steps,date) VALUES({steps},'{date}')";
-            using (SqliteCommand insert = new(sql, connection))
+            _ = int.TryParse(stepsInput, out int steps);
+            string idExistsQuery = $"SELECT * FROM steps WHERE date='{date}'";
+
+            SqliteCommand idExists = new(idExistsQuery, connection);
+            SqliteDataReader idExistsReader = idExists.ExecuteReader();
+
+            if (idExistsReader.HasRows)
+            {
+                Menu.PrintError("You already logged your steps for today, select 'Update Steps' to change this entry");
+                Menu.EnterToContinue();
+                continue;
+            }
+
+            string insertQuery = $"INSERT INTO steps(steps,date) VALUES({steps},'{date}')";
+            using (SqliteCommand insert = new(insertQuery, connection))
             {
                 insert.ExecuteNonQuery();
             }
@@ -54,14 +66,13 @@ while (true)
             }
             break;
         case 3:
+            using (SqliteCommand getTable = new(Queries.getTable, connection))
+            {
+                using SqliteDataReader reader = getTable.ExecuteReader();
+                Menu.PrintTableRows(reader);
+            }
             while (true)
             {
-                using (SqliteCommand getTable = new(Queries.getTable, connection))
-                {
-                    using SqliteDataReader reader = getTable.ExecuteReader();
-                    Menu.PrintTableRows(reader);
-                }
-
                 Console.WriteLine("Choose which entry to update");
                 Console.Write("ID: ");
                 string? idInput = Console.ReadLine();
@@ -103,14 +114,13 @@ while (true)
             }
             break;
         case 4:
+            using (SqliteCommand getTable = new(Queries.getTable, connection))
+            {
+                using SqliteDataReader reader = getTable.ExecuteReader();
+                Menu.PrintTableRows(reader);
+            }
             while (true)
             {
-                using (SqliteCommand getTable = new(Queries.getTable, connection))
-                {
-                    using SqliteDataReader reader = getTable.ExecuteReader();
-                    Menu.PrintTableRows(reader);
-                }
-
                 Console.WriteLine("Choose which entry to delete");
                 Console.Write("ID: ");
                 string? idToDeleteInput = Console.ReadLine();
