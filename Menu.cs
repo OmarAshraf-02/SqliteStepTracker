@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Spectre.Console;
 
 namespace SqliteStepTracker;
 internal static class Menu
@@ -48,13 +49,18 @@ internal static class Menu
 
     internal static void PrintTableRows(SqliteDataReader reader)
     {
+
         if (reader.HasRows)
         {
-            PrintCyan("ID\tSteps\tDate");
+            var table = new Table();
+            table.AddColumn("[bold cyan3]ID[/]");
+            table.AddColumn("[bold cyan3]Steps[/]");
+            table.AddColumn("[bold cyan3]Date[/]");
             while (reader.Read())
             {
-                Console.WriteLine($"{reader.GetInt32(0)}\t{reader.GetInt32(1)}\t{reader.GetDateTime(2):dd-MM-yyyy}");
+                table.AddRow($"{reader.GetInt32(0)}", $"{reader.GetInt32(1)}", $"{reader.GetDateTime(2):dd-MM-yyyy}");
             }
+            AnsiConsole.Write(table);
         }
         else
         {
@@ -64,16 +70,12 @@ internal static class Menu
 
     internal static void PrintCyan(string s)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine(s);
-        Console.ForegroundColor = ConsoleColor.White;
+        AnsiConsole.Markup($"[bold cyan3]{s}[/]\n");
     }
 
     internal static void PrintError(string s)
     {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(s);
-        Console.ForegroundColor = ConsoleColor.White;
+        AnsiConsole.Markup($"[bold maroon]{s}[/]\n");
     }
 
     internal static void EnterToContinue()
