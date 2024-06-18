@@ -2,15 +2,9 @@
 using Microsoft.Data.Sqlite;
 
 Console.Clear();
-
 bool exit = false;
 string path = $"Data Source={Environment.CurrentDirectory}/Steps.db";
-
-using SqliteConnection connection = new(path);
-connection.Open();
-
-SqliteCommand createTable = new(Queries.createTable, connection);
-createTable.ExecuteNonQuery();
+using SqliteConnection connection = Db.InitializeDb(path);
 
 while (true)
 {
@@ -29,7 +23,7 @@ while (true)
         case 1:
             Console.Write("Steps: ");
             string? stepsInput = Console.ReadLine();
-            Menu.InsertMenuInputLoop(ref stepsInput);
+            Menu.StepInputLoop(ref stepsInput);
 
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
             string date = currentDate.ToString("yyyy-MM-dd");
@@ -57,95 +51,46 @@ while (true)
             Menu.EnterToContinue();
             break;
         case 2:
-            using (SqliteCommand getTable = new(Queries.getTable, connection))
-            {
-                using SqliteDataReader reader = getTable.ExecuteReader();
-                Menu.PrintTableRows(reader);
-
-                Menu.EnterToContinue();
-            }
+            Menu.PrintTable(connection);
+            Menu.EnterToContinue();
             break;
         case 3:
-            using (SqliteCommand getTable = new(Queries.getTable, connection))
-            {
-                using SqliteDataReader reader = getTable.ExecuteReader();
-                Menu.PrintTableRows(reader);
-            }
+            Menu.PrintTable(connection);
             while (true)
             {
                 Console.WriteLine("Choose which entry to update");
                 Console.Write("ID: ");
+
                 string? idInput = Console.ReadLine();
+                Menu.IdInputLoop(ref idInput, connection);
 
-                bool isValidNumber = int.TryParse(idInput, out int parsedId) && parsedId > 0;
-                if (!isValidNumber)
-                {
-                    Menu.PrintError("Input a valid integer ID > 0");
-                    continue;
-                }
+                _ = int.TryParse(idInput, out int parsedId);
 
-                string findIdQuery = $"SELECT * FROM steps WHERE id={parsedId}";
-                SqliteCommand findId = new(findIdQuery, connection);
-                SqliteDataReader findIdReader = findId.ExecuteReader();
-
-                if (!findIdReader.HasRows)
-                {
-                    Menu.PrintError("ID wasn't found");
-                    continue;
-                }
-
-                Console.Write($"Updated Steps for entry no.{parsedId}: ");
+                Console.Write($"Steps for entry no.{parsedId}: ");
                 string? stepInput = Console.ReadLine();
-                bool isValidSteps = int.TryParse(stepInput, out int parsedSteps) && parsedSteps > 0;
+                Menu.StepInputLoop(ref stepInput);
 
-                if (!isValidSteps)
-                {
-                    Menu.PrintError("Input a valid number of steps >= 0");
-                    continue;
-                }
+                _ = int.TryParse(stepInput, out int parsedSteps);
 
-                string updateQuery = $"UPDATE steps SET steps = {parsedSteps} WHERE id = {parsedId}";
-                SqliteCommand updateSteps = new(updateQuery, connection);
-                updateSteps.ExecuteNonQuery();
-
+                Db.UpdateSteps(parsedId, parsedSteps, connection);
                 Menu.PrintCyan($"Updated step entry no.{parsedId} to {parsedSteps} steps");
                 Menu.EnterToContinue();
                 break;
             }
             break;
         case 4:
-            using (SqliteCommand getTable = new(Queries.getTable, connection))
-            {
-                using SqliteDataReader reader = getTable.ExecuteReader();
-                Menu.PrintTableRows(reader);
-            }
+            Menu.PrintTable(connection);
             while (true)
             {
                 Console.WriteLine("Choose which entry to delete");
                 Console.Write("ID: ");
+
                 string? idToDeleteInput = Console.ReadLine();
+                Menu.IdInputLoop(ref idToDeleteInput, connection);
 
-                bool isValidNumber = int.TryParse(idToDeleteInput, out int parsedIdToDelete) && parsedIdToDelete > 0;
-                if (!isValidNumber)
-                {
-                    Menu.PrintError("Input a valid integer ID > 0");
-                    continue;
-                }
+                _ = int.TryParse(idToDeleteInput, out int parsedIdToDelete);
 
-                string findIdQuery = $"SELECT * FROM steps WHERE id={parsedIdToDelete}";
-                SqliteCommand findId = new(findIdQuery, connection);
-                SqliteDataReader findIdReader = findId.ExecuteReader();
-
-                if (!findIdReader.HasRows)
-                {
-                    Menu.PrintError("ID wasn't found");
-                    continue;
-                }
-
-                string deleteQuery = $"DELETE from steps WHERE id={parsedIdToDelete}";
-                SqliteCommand deleteSteps = new(deleteQuery, connection);
-                deleteSteps.ExecuteNonQuery();
-
+                Db.DeleteSteps(parsedIdToDelete, connection);
                 Menu.PrintCyan($"Deleted step entry no.{parsedIdToDelete}");
                 Menu.EnterToContinue();
                 break;

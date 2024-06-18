@@ -2,20 +2,24 @@
 
 internal static class Input
 {
-    internal static bool ValidateMainMenuInput(string? input)
+    internal static bool IsValidMainMenuInput(string? input)
     {
-        bool invalidInput = (input == null) ||
-                            (!int.TryParse(input, out int parsedInput)) ||
-                             parsedInput < 0 ||
-                             parsedInput > 4;
-
-        return !invalidInput;
+        bool isValidInput = (input != null) &&
+                            int.TryParse(input, out int parsedInput) &&
+                            parsedInput >= 0 &&
+                            parsedInput <= 4;
+        return isValidInput;
     }
 
-    internal static bool ValidateInsertionInput(ref string? steps)
+    internal static bool IsValidStepsInput(string? steps)
     {
-        if (!int.TryParse(steps, out int parsedSteps) || parsedSteps < 0) return false;
+        bool isValidInput = int.TryParse(steps, out int parsedSteps) && parsedSteps >= 0;
+        return isValidInput;
+    }
 
-        return true;
+    internal static bool IsValidIdInput(string? id)
+    {
+        bool isValidId = int.TryParse(id, out int parsedId) && parsedId > 0;
+        return isValidId;
     }
 }

@@ -23,7 +23,7 @@ internal static class Menu
 
     internal static string? MainMenuInputLoop(string? input)
     {
-        while (!Input.ValidateMainMenuInput(input))
+        while (!Input.IsValidMainMenuInput(input))
         {
             Console.Clear();
             PrintInvalidInput();
@@ -34,32 +34,48 @@ internal static class Menu
         return input;
     }
 
-    internal static void InsertMenuInputLoop(ref string? stepsInput)
+    internal static void StepInputLoop(ref string? stepsInput)
     {
-        while (!Input.ValidateInsertionInput(ref stepsInput))
+        while (!Input.IsValidStepsInput(stepsInput))
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Input a valid number of steps");
-            Console.ForegroundColor = ConsoleColor.White;
-
+            PrintError("Input a valid number of steps >= 0");
             Console.Write("Steps: ");
             stepsInput = Console.ReadLine();
         }
     }
 
-    internal static void PrintTableRows(SqliteDataReader reader)
+    internal static void IdInputLoop(ref string? idInput, SqliteConnection connection)
     {
+        while (!Input.IsValidIdInput(idInput) || !Db.FindId(int.Parse(idInput), connection))
+        {
+            PrintError("Input an existing integer ID > 0");
+            Console.Write("ID: ");
+            idInput = Console.ReadLine();
+        }
+    }
 
+    internal static Table CreateTable(SqliteDataReader reader)
+    {
+        var table = new Table();
+        table.AddColumn("[bold cyan3]ID[/]");
+        table.AddColumn("[bold cyan3]Steps[/]");
+        table.AddColumn("[bold cyan3]Date[/]");
+        while (reader.Read())
+        {
+            table.AddRow($"{reader.GetInt32(0)}", $"{reader.GetInt32(1)}", $"{reader.GetDateTime(2):dd-MM-yyyy}");
+        }
+
+        return table;
+    }
+
+    internal static void PrintTable(SqliteConnection connection)
+    {
+        using SqliteCommand getTable = new(Queries.getTable, connection);
+        using SqliteDataReader reader = getTable.ExecuteReader();
         if (reader.HasRows)
         {
-            var table = new Table();
-            table.AddColumn("[bold cyan3]ID[/]");
-            table.AddColumn("[bold cyan3]Steps[/]");
-            table.AddColumn("[bold cyan3]Date[/]");
-            while (reader.Read())
-            {
-                table.AddRow($"{reader.GetInt32(0)}", $"{reader.GetInt32(1)}", $"{reader.GetDateTime(2):dd-MM-yyyy}");
-            }
+            var table = CreateTable(reader);
+            CreateTable(reader);
             AnsiConsole.Write(table);
         }
         else
