@@ -45,3 +45,5 @@ dotnet build
 ```bash
 dotnet run
 ```
+## Demo
+![SqliteStepTrackerDemo](https://github.com/OmarAshraf-02/SqliteStepTracker/assets/106477290/c6dd4ecb-01f3-412c-aea2-b0fd8159b248)
