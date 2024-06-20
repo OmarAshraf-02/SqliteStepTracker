@@ -2,6 +2,8 @@
 
 A C# console application made to practice SQLite and CRUD operations as well as using external NuGet packages, in this case Spectre.Console.
 
+## Features
+
 The app is a simple daily step tracker where the user can:
 
 - Log their steps for the day.
